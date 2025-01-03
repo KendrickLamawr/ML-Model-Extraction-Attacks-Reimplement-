@@ -14,7 +14,8 @@ data, labels = load_svmlight_file("binary_classifiers/targets/adult/train.scale"
 model.train(data, labels)
 
 
-X_test, y_test = load_svmlight_file("binary_classifiers/targets/adult/test")
+X_test, y_test = load_svmlight_file("binary_classifiers/targets/adult/test") #test.scale
+y_test[y_test == -1] = 0
 num_features = X_test.shape[1]
 # choose 109 random rows corresponding to weights of 108 features + 1 bias
 indices = np.random.choice(X_test.shape[0], 109, replace=False)
@@ -29,6 +30,8 @@ clone_model.solve(X_solve, y_solve)
 pred_clone = clone_model.predict(X_test.toarray())
 pred_oracle = model.predict(X_test.toarray())
 '''COMPARE ACCURACY OF CLONE AND ORACLE
-We only need 109 data points to recover 99.57% a model which was trained on 34190 data points.
+We only need 109 data points to recover 99.57% a model which was trained on 34190 data points
 '''
-print(accuracy_score(np.argmax(pred_clone, axis=1), np.argmax(pred_oracle, axis=1)))
+print("The similarities between oracle and cloned:", accuracy_score(np.argmax(pred_clone, axis=1), np.argmax(pred_oracle, axis=1)))
+# print(y_test)
+print("Clone Accuracy:", accuracy_score(y_test, np.argmax(pred_clone, axis=1)))
