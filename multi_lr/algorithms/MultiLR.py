@@ -1,12 +1,19 @@
 from sklearn.linear_model import LogisticRegression
 import pickle
+from sklearn.datasets import load_iris
 class SoftmaxRegressionModel:
-    def __init__(self, method):
+    def __init__(self, method, max_iter = 200):
         if method == 'multinomial':
-            self.model = LogisticRegression(multi_class="multinomial", solver="lbfgs")
+            self.model = LogisticRegression(multi_class="multinomial", solver="lbfgs", max_iter=max_iter)
         else:
             self.model = LogisticRegression(multi_class="ovr")
-    
+    def train_iris(self):
+        iris = load_iris()
+        X = iris.data
+        y = iris.target
+        self.train(X, y)
+    def get_classes(self):
+        return self.model.classes_
     def train(self, X_train, y_train):
         self.model.fit(X_train, y_train)
 

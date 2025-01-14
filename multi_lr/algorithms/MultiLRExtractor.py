@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from algorithms import utils
 import numpy as np
 from scipy.optimize import minimize
+from algorithms.utils import utils
 class MultiLRExtractor:
     '''
     Extract coefficients from multiple logistic regression models.
@@ -9,22 +10,23 @@ class MultiLRExtractor:
     def __init__(self):
         # self.classes = self.get_classes()
         # self.X_train = None
-        self.target = None
+        self.best_w = None
+        self.classes = self.get_classes()
     
     def softmax(self, z):
         exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))
         return exp_z / np.sum(exp_z, axis=1, keepdims=True)
     
-    # @abstractmethod
-    # def get_classes(self):
-    #     return
+    @abstractmethod
+    def get_classes(self):
+        return
     
-    # @abstractmethod
-    # def num_features(self):
-    #     return
+    @abstractmethod
+    def num_features(self):
+        return
     
     def gen_query_set(self, n_features, n_samples):
-        return gen_query_set(n_features, n_samples)
+        return utils.gen_query_set(n_features, n_samples)
 
     def set_target(self, model):
         self.target = model
@@ -66,6 +68,8 @@ class MultiLRExtractor:
                     best_acc = acc
         return best_w, best_acc
     
+    # def find_coefficients(self, budget, adapt = False):
+
     def compare_with_target(self, X, wopt):
         clone_pred = np.argmax(self.softmax(X @ wopt), axis = 1)
         
