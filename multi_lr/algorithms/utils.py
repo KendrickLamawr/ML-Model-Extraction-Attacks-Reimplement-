@@ -21,6 +21,15 @@ class utils:
             raise ValueError('Unsupported data type')
         
     @staticmethod
+    def query_count(X, Y, eps):
+        dist = squareform(pdist(X, 'euclidean'))
+        tot = 0
+        for (i,j) in utils.all_pairs(Y):
+            if dist[i][j] > eps:
+                tot += math.ceil(np.log2(dist[i][j]/eps))
+        return tot
+
+    @staticmethod
     def line_search_oracle(n_features, budget, oracle, query_generator, error_thres=1e-1):
         """
         Line search oracle for finding the optimal query point
@@ -31,6 +40,26 @@ class utils:
         budget_0 = budget
         budget -= 1
 
+        step = (budget+3)/4
+        while utils.query_count(X_init, Y, error_thres) <= budget:
+            x = query_generator(n_features, step)
+            y = oracle.predict(x)
+            X_init = np.vstack((X_init, x))
+            Y = np.hstack((Y, y))
+            budget -= step
+        
+        if budget <= 0:
+            assert len(X_init) >= budget_0
+            return X_init[0:budget_0]
+        
+        Y = Y.flatten()
+        idx1, idx2 = zip(*utils.all_pairs(Y))
+        idx1 = list(idx1)
+        idx2 = list(idx2)
+        samples = utils._line_search(X_init, Y, idx1, idx2, oracle.predict, error_thres, append = True)
+        assert len(samples) >= budget_0
+        return samples[0:budget_0]
+    
     @staticmethod
     def _line_search(X, Y, idx1, idx2, predict_fn, error_thres, append=False):
         v1 = X[idx1,:] 
@@ -84,6 +113,8 @@ class utils:
                 if c != Y[i]
                 for j in np.where(Y == c)[0][0:1]   
                 if i > j]
+    
+ 
 
 
 

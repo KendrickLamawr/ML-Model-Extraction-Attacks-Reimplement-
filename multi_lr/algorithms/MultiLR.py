@@ -4,7 +4,9 @@ from sklearn.datasets import load_iris
 class SoftmaxRegressionModel:
     def __init__(self, method, max_iter = 200):
         if method == 'multinomial':
-            self.model = LogisticRegression(multi_class="multinomial", solver="lbfgs", max_iter=max_iter)
+            self.model = LogisticRegression(multi_class="multinomial", 
+                                            solver="lbfgs", 
+                                            max_iter=max_iter)
         else:
             self.model = LogisticRegression(multi_class="ovr")
     def train_iris(self):
